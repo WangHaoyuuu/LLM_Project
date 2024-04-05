@@ -177,4 +177,24 @@
             ```
     2. 利用LangChain调用百度文心
         - 原生的 LangChain 是不支持文心调用的, 我们需要自定义支持调用文心的LLM
-    
+            ```
+            from wenxin_llm import Wenxin_LLM
+            ```
+        - 将文心的api_key和secret_key存储在.env文件中,并使用以下代码加载
+            ```
+            from dotenv import load_dotenv, find_dotenv
+            import os
+            _ = load_dotenv(find_dotenv())
+            # 获取API_KEY和SECRET_KEY
+            wenxin_api_key = os.environ["WENXIN_API_KEY"]
+            wenxin_secret_key = os.environ["WENXIN_SECRET_KEY"]
+            ```
+        - 实例化Wenxin_LLM
+            ```
+                wenxin_llm = Wenxin_LLM(wenxin_api_key, wenxin_secret_key)
+                wenxin_llm("你好")
+            ```
+
+4. 调用讯飞星火
+    1. 星火 API 需要使用 WebSocket 来进行调用
+    2. 调用原生星火API
