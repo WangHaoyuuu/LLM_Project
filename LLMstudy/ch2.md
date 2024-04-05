@@ -198,3 +198,44 @@
 4. 调用讯飞星火
     1. 星火 API 需要使用 WebSocket 来进行调用
     2. 调用原生星火API
+        - 对test.py中的调用逻辑进行讲解
+        1. 配置密匙信息
+            ```
+            import SparkApi
+
+            # 设置密匙信息
+            appid = ""  
+            api_secret = ""
+            api_key = ""
+
+            # 用于配置大模型版本
+            domain = "general" # v1.5版本
+
+            # 云端环境的服务地址
+            Spark_url = "ws://spark-api.xf-yun.com/v1.1/chat" # v1.5版本 
+            ```
+
+        2. 星火的调用传参(列表中包括role和Prompt)
+            ```
+            def getText(role, content, text = []):
+                # role 表示说话的角色，content 表示Prompt的内容
+                jsoncon = {}
+                jsoncon["role"] = role
+                jsoncon["content"] = content
+                text.append(jsoncon)
+                return text
+            
+            questions = getText("user", "你好")            
+            ```
+        3. 调用SparkApi.py中的main函数
+            ```
+            response = SparkApi.main(appid, api_key, api_secret, Spark_url, domain, questions)
+            response
+            ```
+        
+        4. 同一API调用方式
+            - 由于星火使用的是WebSocket，因此不能使用requests进行访问，通过FastAPI将星火API封装成本地的API(spark_api.py)
+            ```
+                # 使用uvicorn命令启动
+                uvicorn spark_api:app
+            ```
