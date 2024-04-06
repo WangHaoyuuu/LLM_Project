@@ -284,4 +284,72 @@
         zhipuai.api_key = "your_api_key"
         model = "chatglm_std"
         ```
-    3. 
+    3. 智谱的调用需要传入列表
+        ```
+        def getText(role, content, text = []):
+            # role 表示说话的角色，content 表示Prompt的内容
+            jsoncon = {}
+            jsoncon["role"] = role
+            jsoncon["content"] = content
+            text.append(jsoncon)
+            return text
+        
+        questions = getText("user", "你好")
+        questions
+
+    4. 调用智谱SDK中的invoke函数
+        ```
+            response = zhipuai.model_api.invoke(
+                model = model, 
+                prompt = questions,)
+            response
+        ```
+    5. 使用LangChain调用智谱
+        ```
+        from zhipuai_llm import ZhipuAILLM
+        zhipuai_llm = ZhipuAILLM(model = "chatglm_std", temperature=0, zhipuai_api_key=zhipuai.api_key)
+        zhipuai_llm("你好")
+        ```
+6. 调用智谱AI生成embedding
+    ```
+    import zhipuai
+    zhipuai.api_key = "your_api_key"
+    model = "text_embedding"
+    ```
+    - 自定义要生成embedding的文本
+        ```
+            text = "要生成embeding的输入文本"
+        ```
+    - 调用智谱SDK中的invoke函数
+        ```
+            response = zhipuai.model_api.invoke(
+                model = model,
+                prompt = text,
+            )
+        ```
+    - 返回是字典的格式，查看code是否为200判断请求是否成功
+        ```
+            print(response['code'])
+        ```
+    - 返回的embedding和token被存放在data中，可以查看embeding
+    的长度
+        ```
+            print(len(response['data']['embeding']))
+        ```
+    - 查看输入的token数量
+        ```
+            print(response['data']['usage']['prompt_tokens'])
+    - 使用LangChain调用智谱AI生成embedding
+        ```
+            import zhipuai
+            from zhipuai_embedding import ZhipuAIEmbedding
+            zhipuai.api_key = "your_api_key"
+            zhipuai_embedding = ZhipuAIEmbedding(zhipuai_api_key=zhipuai.api_key)
+            # 可以生成query的embedding
+            # query的embedding可以用于搜索
+            query_embedding = zhipuai_embedding.embed_query("要生成embeding的输入文本")
+            # 也可以生成doc_list的embedding
+            # doc_list的embedding可以用于生成摘要
+            doc_list_embedding = zhipuai_embedding.embed_documents("要生成embeding的输入文本")
+        ```
+    
