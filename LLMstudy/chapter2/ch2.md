@@ -234,8 +234,54 @@
             ```
         
         4. 同一API调用方式
-            - 由于星火使用的是WebSocket，因此不能使用requests进行访问，通过FastAPI将星火API封装成本地的API(spark_api.py)
-            ```
-                # 使用uvicorn命令启动
-                uvicorn spark_api:app
-            ```
+            - 由于星火使用的是WebSocket，因此不能使用requests进行访问，通过FastAPI将星火API封装成本地的API(spark_api.py)文件在chapter2文件夹
+                ```
+                    # 使用uvicorn命令启动
+                    uvicorn spark_api:app
+                ```
+            - 启动后会在8000端口开启api服务
+            - 调用方式，发起Request请求
+                ```
+                import requests
+                api_url = "http://127.0.0.1:8000/spark"
+                headers = {
+                    "Content-Type": "application/json"}
+                data = {
+                    "prompt": "你好",
+                    "temperature": 0.6
+                    "max_tokens": 3096
+                }
+
+                response = requests.post(api_url, headers=headers, json=data)
+                response.text
+                ```
+
+            - 同样的封装一个函数后使用
+                ```
+                def chat_with_spark(prompt,temperature=0.6, max_tokens=3096):
+                    api_url = "http://127.0.0.1:8000/spark"
+                    headers = {
+                        "Content-Type": "application/json"
+                    }
+                    data = {
+                        "prompt": prompt,
+                        "temperature": temperature,
+                        "max_tokens": max_tokens
+                    }
+                    response = requests.post(api_url, headers=headers, json=data)
+                    return response.text
+
+                chat_with_spark("你好")
+                '''
+5. 调用ChatGLM
+    1. 智谱提供了SDK和原生HTTP来实现调用，建议使用SDK来获得更好的编程体验
+        ```
+        pip install zhipuai
+        ```
+    2. 调用SDK
+        ```
+        import zhipuai
+        zhipuai.api_key = "your_api_key"
+        model = "chatglm_std"
+        ```
+    3. 
