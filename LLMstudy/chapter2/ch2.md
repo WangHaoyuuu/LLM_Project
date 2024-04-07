@@ -194,7 +194,6 @@
                 wenxin_llm = Wenxin_LLM(wenxin_api_key, wenxin_secret_key)
                 wenxin_llm("你好")
             ```
-
 4. 调用讯飞星火
     1. 星火 API 需要使用 WebSocket 来进行调用
     2. 调用原生星火API
@@ -352,4 +351,76 @@
             # doc_list的embedding可以用于生成摘要
             doc_list_embedding = zhipuai_embedding.embed_documents("要生成embeding的输入文本")
         ```
-    
+7. Langchain组件详解
+    1. 模型的输入输出
+        - 输入：管理prompt
+        - 输出：调用API获取回复
+        - 主要包含Prompts, Language Models, Output Parsers
+    2. 数据连接
+        - 大语言模型的知识来源于其训练数据集，并没有用户信息
+        - 加载：Document loaders
+        - 转存：Document transformers，Text embedding models，Vector stores
+        - 查询数据：Retrievers
+    3. Chain(链)
+        - 独立使用大模型能应对简单的任务，更复杂的需求，需要将多个大模型链式组合，或与其他组件进行链式调用
+        - LLMChain是一个简单而强大的链，许多链以它为基础
+            ```
+            from langchain.chat_models import ChatOpenAI
+            from langchain.prompts import ChatPromptTemplate
+            from langchain.chain import LLMChain
+            
+            # 实例化大模型
+            llm = ChatOpenAI(temperature=0.6)
+            # 实例化prompt
+            prompt = ChatPromptTemplate.from_messages([
+            "描述制造{product}的一个公司的最佳名称是什么?"
+            ])
+            # 将LLM和prompt组合成LLMChain
+            chain = LLMChain(llm=llm, prompt=prompt)
+            # 调用LLMChain
+            product = "手机"
+            chain.run(product)
+            ```
+        - 除了LLMChain，还有
+            - RouterChain:根据输入的内容，选择不同的LLM进行调用
+            - Transformation:将输入的内容进行转换，再调用LLM
+            - SimpleSequentialChain:最简单的序列链形式，上一个步骤的输出是下一个步骤的输入
+            - sequence_chains:简单顺序链的更复杂形式，允许多个输入/输出
+            ```
+            # SimpleSequentialChain 的代码示例
+            from langchain.chains import SimpleSequentialChain
+            llm = ChatOpenAI(temperature=0.6)
+
+            # 创建第一个LLMChain
+            prompt1 = ChatPromptTemplate.from_messages([
+                "描述制造{product}的一个公司的最佳名称是什么?"
+            ])
+            chain1 = LLMChain(llm=llm, prompt=prompt1)
+
+            # 创建第二个LLMChain
+            prompt2 = ChatPromptTemplate.from_messages([
+                "写一个20字的描述对于{product}公司"
+            ])
+            chain2 = LLMChain(llm=llm, prompt=prompt2)
+
+            # 创建SimpleSequentialChain
+            overall_chain = SimpleSequentialChain(chains=[chain1, chain2]，verbose=True)
+
+            product = "手机"
+            overall_chain.run(product)
+            ```
+    4. 记忆(Memory)
+        - 在LangChain中，记忆指的是LLM的短期记忆
+    5. 智能体(Agents)
+        - 代理作为语言模型的外部模块，可提供计算、逻辑、检索等功能的支持，使语言模型获得异常强大的推理和获取信息的超能力
+    6. 回调(Callback)
+        - 能连接到LLM的各个阶段，充当日志功能
+            - CallbackHandler：记录日志
+            - CallbackManager：封装管理所有的CallbackHandler
+        - 在哪里传入回调
+            1. **构造函数回调**构造函数LLMChain(callbacks=[handler], tags=['a-tag']) ，它将被用于对该对象的所有调用，并且将只针对该对象
+            2. **请求回调**在用于发出请求的 call() / run() / apply() 方法中chain.call(inputs, callbacks=[handler]) ，它将仅用于该特定请求，以及它包含的所有子请求
+            - verbose 参数在整个 API 的大多数对象（链、模型、工具、代理等）上都可以作为构造参数使用
+            - 构造函数回调对诸如日志、监控等用例最有用
+            - 请求回调对流媒体等用例最有用
+8. 完成
