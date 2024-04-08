@@ -20,7 +20,7 @@ template = """使用以下上下文来回答最后的问题。如果你不知道
 # 定义一个数据模型，用于接收POST请求中的数据
 class Item(BaseModel):
     prompt : str # 用户 prompt
-    model : str = "gpt-3.5-turbo"# 使用的模型
+    model : str = "chatglm_std"# 使用的模型
     temperature : float = 0.1# 温度系数
     if_history : bool = False # 是否使用历史对话功能
     # API_Key

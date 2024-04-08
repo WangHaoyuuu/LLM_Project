@@ -22,7 +22,6 @@ from qa_chain.QA_chain_self import QA_chain_self
 # 这允许您使用 os.environ 来读取在 .env 文件中设置的环境变量
 _ = load_dotenv(find_dotenv())
 LLM_MODEL_DICT = {
-    "openai": ["gpt-3.5-turbo", "gpt-3.5-turbo-16k-0613", "gpt-3.5-turbo-0613", "gpt-4", "gpt-4-32k"],
     "wenxin": ["ERNIE-Bot", "ERNIE-Bot-4", "ERNIE-Bot-turbo"],
     "xinhuo": ["Spark-1.5", "Spark-2.0"],
     "zhipuai": ["chatglm_pro", "chatglm_std", "chatglm_lite"]
@@ -32,9 +31,9 @@ LLM_MODEL_DICT = {
 LLM_MODEL_LIST = sum(list(LLM_MODEL_DICT.values()),[])
 INIT_LLM = "chatglm_std"
 EMBEDDING_MODEL_LIST = ['zhipuai']
-INIT_EMBEDDING_MODEL = "openai"
-DEFAULT_DB_PATH = "../../database/knowledge_db"
-DEFAULT_PERSIST_PATH = "../../data_base/vector_db/chroma"
+INIT_EMBEDDING_MODEL = "zhipuai"
+DEFAULT_DB_PATH = "/workspaces/LLM_Project/database/knowledge_db"
+DEFAULT_PERSIST_PATH = "/workspaces/LLM_Project/data_base/vector_db/chroma"
 # AIGC_AVATAR_PATH = "aigc_avatar.png"
 # DATAWHALE_AVATAR_PATH = "datawhale_avatar.png"
 # AIGC_LOGO_PATH = "../../figures/aigc_logo.png"
@@ -54,7 +53,7 @@ class Model_center():
         self.chat_qa_chain_self = {}
         self.qa_chain_self = {}
 
-    def chat_qa_chain_self_answer(self, question: str, chat_history: list = [], model: str = "openai", embedding: str = "openai", temperature: float = 0.0, top_k: int = 4, history_len: int = 3, file_path: str = DEFAULT_DB_PATH, persist_path: str = DEFAULT_PERSIST_PATH):
+    def chat_qa_chain_self_answer(self, question: str, chat_history: list = [], model: str = "chatglm_std", embedding: str = "zhipuai", temperature: float = 0.0, top_k: int = 4, history_len: int = 3, file_path: str = DEFAULT_DB_PATH, persist_path: str = DEFAULT_PERSIST_PATH):
         """
         调用带历史记录的问答链进行回答
         """
@@ -69,7 +68,7 @@ class Model_center():
         except Exception as e:
             return e, chat_history
 
-    def qa_chain_self_answer(self, question: str, chat_history: list = [], model: str = "openai", embedding="openai", temperature: float = 0.0, top_k: int = 4, file_path: str = DEFAULT_DB_PATH, persist_path: str = DEFAULT_PERSIST_PATH):
+    def qa_chain_self_answer(self, question: str, chat_history: list = [], model: str = "chatglm_std", embedding="zhipuai", temperature: float = 0.0, top_k: int = 4, file_path: str = DEFAULT_DB_PATH, persist_path: str = DEFAULT_PERSIST_PATH):
         """
         调用不带历史记录的问答链进行回答
         """
@@ -246,6 +245,6 @@ with block as demo:
 # threads to consume the request
 gr.close_all()
 # 启动新的 Gradio 应用，设置分享功能为 True，并使用环境变量 PORT1 指定服务器端口。
-# demo.launch(share=True, server_port=int(os.environ['PORT1']))
+demo.launch(share=True)
 # 直接启动
-demo.launch()
+# demo.launch()
